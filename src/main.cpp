@@ -16,9 +16,8 @@ int main(int argc, char* argv[]) {
   float key;
   string value;
   string r;
-  const size_t n = 3;
   bool insert_status = false;
-  BPlusTree<float, string> bt;
+  BPlusTree<float, string> bt(10);
   while (file && getline(file, linebuffer)) {
     if (linebuffer.length() == 0) continue;
     split(linebuffer, DELIMITERS, elems);
@@ -51,11 +50,6 @@ int main(int argc, char* argv[]) {
       cout << "error" << endl;
       exit(0);
     }
-
-    // for (std::vector<string>::iterator it = elems.begin() ; it != elems.end(); ++it) {
-    //   cout << ' ' << *it;
-    // }
-    // cout << endl;
     elems.clear();
   }
   return 0;

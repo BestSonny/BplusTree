@@ -7,16 +7,21 @@
 #include <string>
 using namespace std;
 template <typename Key, typename Value>
+
+
+#define MAX_CHILD_NUM  50
+#define MAX_KEY_NUM MAX_CHILD_NUM-1
+#define MAX_LEAF_SLOT MAX_CHILD_NUM-1
 class BPlusTree
 {
 private:
-    static const int minimumDegree = 2;
-    static const int minKeyNum = minimumDegree - 1;
-    static const int maxKeyNum = 2*minimumDegree - 1;
-    static const int minChildNum = minimumDegree;
-    static const int maxChildNum = 2*minimumDegree;
-    static const int minLeafSlot = minKeyNum;
-    static const int maxLeafSlot = maxKeyNum;
+    int minimumDegree;
+    int minKeyNum;
+    int maxKeyNum;
+    int minChildNum;
+    int maxChildNum;
+    int minLeafSlot;
+    int maxLeafSlot;
     class Node
     {
     public:
@@ -32,10 +37,13 @@ private:
     {
         friend class BPlusTree;
     private:
-        Node* child[maxChildNum];
-        Key key[maxKeyNum];
+        Node* child[MAX_CHILD_NUM];
+        Key key[MAX_KEY_NUM];
+        int minKeyNum;
+        int maxChildNum;
     public:
-    		innerNode() {this->isLeaf = false;}
+    		innerNode(int maxChildNum, int minKeyNum) {this->maxChildNum = maxChildNum; this->minKeyNum = minKeyNum;
+                                                   this->isLeaf = false;}
         virtual int getLower(Key k);
         void insert(Key key, Node *p);
         int split(Node* newNode, Key k);
@@ -45,12 +53,15 @@ private:
     {
         friend class BPlusTree;
     private:
-        Value value[maxLeafSlot];
-        Key key[maxLeafSlot];
+        Value value[MAX_LEAF_SLOT];
+        Key key[MAX_LEAF_SLOT];
         leafNode *left;
         leafNode *right;
+        int minKeyNum;
+        int maxLeafSlot;
     public:
-        leafNode() {this->isLeaf = true; this->left = NULL; this->right = NULL;}
+        leafNode(int maxLeafSlot, int minKeyNum) {this->minKeyNum = minKeyNum; this->maxLeafSlot = maxLeafSlot;
+                                                  this->isLeaf = true; this->left = NULL; this->right = NULL;}
         virtual int getLower(Key k);
         void insert(Key key, Value value);
         int split(leafNode* newNode);
@@ -65,9 +76,16 @@ private:
     void insertNode(Node* node, Key key, Value value, Node* p, stack<Node *>* parent);
 
 public:
-    BPlusTree() {
+    BPlusTree(int N) {
         root = NULL;
         leftHead = NULL;
+        minimumDegree = 2;
+        minKeyNum = minimumDegree - 1;
+        maxKeyNum = N - 1;
+        minChildNum = (N+1)/2;
+        maxChildNum = N;
+        minLeafSlot = minKeyNum;
+        maxLeafSlot = maxKeyNum;
     }
 
     bool get(Key key, Value& value);

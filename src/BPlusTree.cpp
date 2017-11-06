@@ -156,7 +156,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
     }
     else {
         if(node->isLeaf) {
-            newNode = new leafNode();
+            newNode = new leafNode(maxLeafSlot, minKeyNum);
             newKey = ((leafNode*)node)->split((leafNode *)newNode);
 
             if(key < newKey) {
@@ -166,7 +166,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
                 ((leafNode*)newNode)->insert(key, v);
         }
         else {
-            newNode = new innerNode();
+            newNode = new innerNode(maxChildNum, minKeyNum);
             newKey = ((innerNode*)node)->split(newNode, key);
             if(newKey == key) {
                 ((innerNode *)newNode)->child[0] = p;
@@ -180,7 +180,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
         }
 
         if(node == root) {
-            innerNode* newRoot = new innerNode();
+            innerNode* newRoot = new innerNode(maxChildNum, minKeyNum);
             newRoot->keyNum = 1;
             newRoot->key[0] = newKey;
             newRoot->child[0] = node;
@@ -201,7 +201,7 @@ void BPlusTree<Key, Value>::put(Key key, Value value)
     stack<Node *> parent;
     Node *n = root;
     if(root == NULL) {
-        root = new leafNode();
+        root = new leafNode(maxLeafSlot, minKeyNum);
         insertNode(root , key, value, NULL , &parent);
         return;
     }
