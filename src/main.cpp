@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <assert.h>
+#include <typeinfo>
 #include "BPlusTree.hpp"
 #include "utils.h"
 using namespace std;
@@ -16,7 +17,7 @@ int main(int argc, char* argv[]) {
   float key;
   string value;
   string r;
-  bool insert_status = false;
+  ofstream myfile("output_file.txt");
   BPlusTree<float, string> bt(10);
   while (file && getline(file, linebuffer)) {
     if (linebuffer.length() == 0) continue;
@@ -31,20 +32,23 @@ int main(int argc, char* argv[]) {
       assert (elems.size() == 3 || elems.size() == 2);
       if (elems.size() == 2) {
         multimap<float, string> res = bt.getrange(stof(elems.at(1)),stof(elems.at(1)));
-        if (res.size() == 0)
-          std::cout << "Null" << '\n';
+        if (res.size() == 0){
+          myfile << "Null" << std::endl;
+        }
         else{
           multimap<float, string>::iterator it;
           for (it = res.begin(); it != res.end(); ++it)
-              std::cout << "(" << it->first << ", " << it->second << "),";
-          std::cout << std::endl;
+              myfile << it->second << ", ";
+          myfile.seekp(-2,myfile.cur);
+          myfile << std::endl;
         }
       }else{
         multimap<float, string> res = bt.getrange(stof(elems.at(1)),stof(elems.at(2)));
         multimap<float, string>::iterator it;
         for (it = res.begin(); it != res.end(); ++it)
-            std::cout << "(" << it->first << ", " << it->second << "),";
-        std::cout << std::endl;
+            myfile << "(" << it->first << ", " << it->second << "), ";
+        myfile.seekp(-2,myfile.cur);
+        myfile << std::endl;
       }
     } else {
       cout << "error" << endl;
@@ -52,5 +56,6 @@ int main(int argc, char* argv[]) {
     }
     elems.clear();
   }
+  myfile.close();
   return 0;
 }
