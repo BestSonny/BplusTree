@@ -26,7 +26,7 @@ Implementation of B+ Tree (In-memory)
   ./treesearch file_name
   ```
   
- ### sample file
+ ### Sample file
  1. We provide a sample file (located at `./data` folder)
  
  ```
