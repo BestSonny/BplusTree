@@ -51,12 +51,12 @@ int main(int argc, char* argv[]) {
       cout << "error" << endl;
       exit(0);
     }
-    elems.clear();
-    // for (std::vector<string>::iterator it = elems.begin() ; it != elems.end(); ++it) {
-    //   cout << ' ' << *it;
-    // }
 
-    // cout << endl;
+    for (std::vector<string>::iterator it = elems.begin() ; it != elems.end(); ++it) {
+      cout << ' ' << *it;
+    }
+    cout << endl;
+    elems.clear();
   }
   return 0;
 }

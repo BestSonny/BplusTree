@@ -5,14 +5,16 @@ int BPlusTree<Key, Value>::innerNode::getLower(Key k)
 {
     if(this->keyNum == 0) return 0;
     int lo = 0, hi = this->keyNum;
-
+    /*
     while(lo < hi) {
         int mid = (lo + hi) / 2;
         if(key[mid] > k) hi = mid;
         else lo = mid + 1;
     }
+    */
+    auto low=std::lower_bound (key, key+hi-1, k);
 
-    return hi;
+    return low-key;
 }
 
 template <class Key, class Value>
@@ -75,14 +77,15 @@ int BPlusTree<Key, Value>::leafNode::getLower(Key k)
 {
     if(this->keyNum == 0) return 0;
     int lo = 0, hi = this->keyNum;
-
+    /*
     while(lo < hi) {
         int mid = (lo + hi) / 2;
-        if(key[mid] >= k) hi = mid;
+        if(key[mid] > k) hi = mid;
         else lo = mid + 1;
     }
-
-    return hi;
+    */
+    auto low=std::lower_bound(key, key+hi-1, k);
+    return low-key;
 }
 
 template <class Key, class Value>
@@ -240,8 +243,10 @@ multimap<Key, Value> BPlusTree<Key, Value>::getrange(Key key1, Key key2)
 
     i = slot;
     while(true) {
+        cout << i << " " << leaf->keyNum << endl;
         for(; i < leaf->keyNum && leaf->key[i] >= key1 && leaf->key[i] <= key2; i++) {
             //res[leaf->key[i]] = leaf->value[i];
+            cout << i << "here" << leaf->keyNum << endl;
             res.insert(pair <Key, Value> (leaf->key[i], leaf->value[i]));
         }
         if(i >= leaf->keyNum) {
