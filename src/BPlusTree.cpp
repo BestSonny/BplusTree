@@ -243,10 +243,8 @@ multimap<Key, Value> BPlusTree<Key, Value>::getrange(Key key1, Key key2)
 
     i = slot;
     while(true) {
-        cout << i << " " << leaf->keyNum << endl;
         for(; i < leaf->keyNum && leaf->key[i] >= key1 && leaf->key[i] <= key2; i++) {
             //res[leaf->key[i]] = leaf->value[i];
-            cout << i << "here" << leaf->keyNum << endl;
             res.insert(pair <Key, Value> (leaf->key[i], leaf->value[i]));
         }
         if(i >= leaf->keyNum) {

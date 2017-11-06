@@ -52,10 +52,10 @@ int main(int argc, char* argv[]) {
       exit(0);
     }
 
-    for (std::vector<string>::iterator it = elems.begin() ; it != elems.end(); ++it) {
-      cout << ' ' << *it;
-    }
-    cout << endl;
+    // for (std::vector<string>::iterator it = elems.begin() ; it != elems.end(); ++it) {
+    //   cout << ' ' << *it;
+    // }
+    // cout << endl;
     elems.clear();
   }
   return 0;
