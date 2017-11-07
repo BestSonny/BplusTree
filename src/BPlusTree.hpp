@@ -41,9 +41,12 @@ private:
         Node* child[MAX_CHILD_NUM];
         Key key[MAX_KEY_NUM];
         int minKeyNum;
+        int maxKeyNum;
         int maxChildNum;
     public:
-    		innerNode(int maxChildNum, int minKeyNum) {this->maxChildNum = maxChildNum; this->minKeyNum = minKeyNum;
+    		innerNode(int maxChildNum, int minKeyNum, int maxKeyNum) {this->child[MAX_CHILD_NUM] = {};
+                                                   this->maxChildNum = maxChildNum; this->minKeyNum = minKeyNum;
+                                                   this->maxKeyNum = maxKeyNum;
                                                    this->isLeaf = false;}
         virtual int getLower(Key k);
         void insert(Key key, Node *p);
@@ -59,9 +62,11 @@ private:
         leafNode *left;
         leafNode *right;
         int minKeyNum;
+        int maxKeyNum;
         int maxLeafSlot;
     public:
-        leafNode(int maxLeafSlot, int minKeyNum) {this->minKeyNum = minKeyNum; this->maxLeafSlot = maxLeafSlot;
+        leafNode(int maxLeafSlot, int minKeyNum, int maxKeyNum) {this->minKeyNum = minKeyNum; this->maxKeyNum = maxKeyNum;
+                                                  this->maxLeafSlot = maxLeafSlot;
                                                   this->isLeaf = true; this->left = NULL; this->right = NULL;}
         virtual int getLower(Key k);
         void insert(Key key, Value value);

@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
   float key;
   string value;
   string r;
-  ofstream myfile("output_file.txt");
-  BPlusTree<float, string> bt(10);
+  ofstream myfile("output_file.txt", std::ofstream::out);
+  BPlusTree<float, string> bt(8);
   while (file && getline(file, linebuffer)) {
     if (linebuffer.length() == 0) continue;
     split(linebuffer, DELIMITERS, elems);
@@ -33,22 +33,24 @@ int main(int argc, char* argv[]) {
       if (elems.size() == 2) {
         multimap<float, string> res = bt.getrange(stof(elems.at(1)),stof(elems.at(1)));
         if (res.size() == 0){
-          myfile << "Null" << std::endl;
+          std::cout << "Null" << std::endl;
+          //myfile << "Null" << std::endl;
         }
         else{
           multimap<float, string>::iterator it;
           for (it = res.begin(); it != res.end(); ++it)
-              myfile << it->second << ", ";
-          myfile.seekp(-2,myfile.cur);
-          myfile << std::endl;
+              std::cout << it->second << ", ";
+          //myfile.seekp(-2,myfile.cur);
+          std::cout  << std::endl;
         }
       }else{
         multimap<float, string> res = bt.getrange(stof(elems.at(1)),stof(elems.at(2)));
         multimap<float, string>::iterator it;
         for (it = res.begin(); it != res.end(); ++it)
-            myfile << "(" << it->first << ", " << it->second << "), ";
-        myfile.seekp(-2,myfile.cur);
-        myfile << std::endl;
+            //myfile << "(" << it->first << ", " << it->second << "), ";
+            std::cout << "(" << it->first << ", " << it->second << "), ";
+        //myfile.seekp(-2,myfile.cur);
+        std::cout << std::endl;
       }
     } else {
       cout << "error" << endl;
@@ -56,6 +58,8 @@ int main(int argc, char* argv[]) {
     }
     elems.clear();
   }
+  file.close();
   myfile.close();
+
   return 0;
 }

@@ -33,35 +33,35 @@ Key BPlusTree<Key, Value>::innerNode::split(Node*  newNode, Key k)
 {
     if(k > key[minKeyNum] && k < key[minKeyNum+1]) {
         for(int i = 0; i < minKeyNum; i++) {
-            ((innerNode *)newNode)->key[i] = key[i+minKeyNum+1];
-            ((innerNode *)newNode)->child[i+1] = child[i+minKeyNum+2];
+            ((innerNode *)newNode)->key[i] = key[i + maxKeyNum - minKeyNum];
+            ((innerNode *)newNode)->child[i+1] = child[i + maxKeyNum - minKeyNum + 1];
         }
         newNode->keyNum = minKeyNum;
-        this->keyNum = minKeyNum + 1;
+        this->keyNum = maxKeyNum - minKeyNum;
         return k;
     }
     else {
-        int retkey = 0;
+        Key retkey = 0;
         if(k > key[minKeyNum + 1]) {
             retkey = key[minKeyNum + 1];
             for(int i = 0; i < minKeyNum - 1; i++) {
-                ((innerNode *)newNode)->key[i] = key[i + minKeyNum + 2];
-                ((innerNode *)newNode)->child[i+1] = child[i+minKeyNum+3];
+                ((innerNode *)newNode)->key[i] = key[i + maxKeyNum - minKeyNum + 1];
+                ((innerNode *)newNode)->child[i+1] = child[i + maxKeyNum - minKeyNum + 2];
             }
-            ((innerNode *)newNode)->child[0] = child[minKeyNum + 2];
+            ((innerNode *)newNode)->child[0] = child[maxKeyNum - minKeyNum + 1];
             newNode->keyNum = minKeyNum - 1;
-            this->keyNum = minKeyNum + 1;
+            this->keyNum = maxKeyNum - minKeyNum;
             return retkey;
         }
         else {
             retkey = key[minKeyNum];
             for(int i = 0; i < minKeyNum; i++) {
-                ((innerNode *)newNode)->key[i] = key[i + minKeyNum + 1];
-                ((innerNode *)newNode)->child[i+1] = child[i+minKeyNum+2];
+                ((innerNode *)newNode)->key[i] = key[i + maxKeyNum - minKeyNum];
+                ((innerNode *)newNode)->child[i+1] = child[i + maxKeyNum - minKeyNum + 1];
             }
-            ((innerNode *)newNode)->child[0] = child[minKeyNum + 1];
+            ((innerNode *)newNode)->child[0] = child[maxKeyNum - minKeyNum];
             newNode->keyNum = minKeyNum;
-            this->keyNum = minKeyNum;
+            this->keyNum = maxKeyNum - minKeyNum - 1;
             return retkey;
         }
     }
@@ -104,10 +104,10 @@ template <class Key, class Value>
 Key BPlusTree<Key, Value>::leafNode::split(leafNode* newNode)
 {
     for(int i = 0; i < minKeyNum; i++) {
-        newNode->key[i] = key[i+minKeyNum+1];
-        newNode->value[i] = value[i + minKeyNum+1];
+        newNode->key[i] = key[i + maxKeyNum - minKeyNum];
+        newNode->value[i] = value[i + maxKeyNum - minKeyNum];
     }
-    this->keyNum = minKeyNum + 1;
+    this->keyNum = maxKeyNum - minKeyNum;
     newNode->keyNum = minKeyNum;
 
     newNode->right = right;
@@ -155,7 +155,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
     }
     else {
         if(node->isLeaf) {
-            newNode = new leafNode(maxLeafSlot, minKeyNum);
+            newNode = new leafNode(maxLeafSlot, minKeyNum, maxKeyNum);
             newKey = ((leafNode*)node)->split((leafNode *)newNode);
 
             if(key < newKey) {
@@ -165,7 +165,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
                 ((leafNode*)newNode)->insert(key, v);
         }
         else {
-            newNode = new innerNode(maxChildNum, minKeyNum);
+            newNode = new innerNode(maxChildNum, minKeyNum, maxKeyNum);
             newKey = ((innerNode*)node)->split(newNode, key);
             if(newKey == key) {
                 ((innerNode *)newNode)->child[0] = p;
@@ -179,7 +179,7 @@ void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, st
         }
 
         if(node == root) {
-            innerNode* newRoot = new innerNode(maxChildNum, minKeyNum);
+            innerNode* newRoot = new innerNode(maxChildNum, minKeyNum, maxKeyNum);
             newRoot->keyNum = 1;
             newRoot->key[0] = newKey;
             newRoot->child[0] = node;
@@ -200,7 +200,7 @@ void BPlusTree<Key, Value>::put(Key key, Value value)
     stack<Node *> parent;
     Node *n = root;
     if(root == NULL) {
-        root = new leafNode(maxLeafSlot, minKeyNum);
+        root = new leafNode(maxLeafSlot, minKeyNum, maxKeyNum);
         insertNode(root , key, value, NULL , &parent);
         return;
     }
@@ -211,9 +211,7 @@ void BPlusTree<Key, Value>::put(Key key, Value value)
         parent.push(n);
         n = inner->child[slot];
     }
-
     leafNode *leaf = (leafNode *)n;
-
     int slot = leaf->getLower(key);
     if(slot > 0) slot -= 1;
     //if(leaf->key[slot] == key) leaf->value[slot] = value;
