@@ -5,16 +5,14 @@ int BPlusTree<Key, Value>::innerNode::getLower(Key k)
 {
     if(this->keyNum == 0) return 0;
     int lo = 0, hi = this->keyNum;
-    /*
+
     while(lo < hi) {
         int mid = (lo + hi) / 2;
         if(key[mid] > k) hi = mid;
         else lo = mid + 1;
     }
-    */
-    auto low=std::lower_bound (key, key+hi-1, k);
 
-    return low-key;
+    return hi;
 }
 
 template <class Key, class Value>
@@ -31,7 +29,7 @@ void BPlusTree<Key, Value>::innerNode::insert(Key k, Node *p)
 }
 
 template <class Key, class Value>
-int BPlusTree<Key, Value>::innerNode::split(Node*  newNode, Key k)
+Key BPlusTree<Key, Value>::innerNode::split(Node*  newNode, Key k)
 {
     if(k > key[minKeyNum] && k < key[minKeyNum+1]) {
         for(int i = 0; i < minKeyNum; i++) {
@@ -77,15 +75,16 @@ int BPlusTree<Key, Value>::leafNode::getLower(Key k)
 {
     if(this->keyNum == 0) return 0;
     int lo = 0, hi = this->keyNum;
-    /*
+
     while(lo < hi) {
         int mid = (lo + hi) / 2;
         if(key[mid] > k) hi = mid;
         else lo = mid + 1;
     }
-    */
-    auto low=std::lower_bound(key, key+hi-1, k);
-    return low-key;
+
+    //auto low=std::lower_bound(key, key+hi-1, k);
+    //return low-key;
+    return hi;
 }
 
 template <class Key, class Value>
@@ -102,7 +101,7 @@ void BPlusTree<Key, Value>::leafNode::insert(Key k, Value v)
 }
 
 template <class Key, class Value>
-int BPlusTree<Key, Value>::leafNode::split(leafNode* newNode)
+Key BPlusTree<Key, Value>::leafNode::split(leafNode* newNode)
 {
     for(int i = 0; i < minKeyNum; i++) {
         newNode->key[i] = key[i+minKeyNum+1];
@@ -149,7 +148,7 @@ template <class Key, class Value>
 void BPlusTree<Key, Value>::insertNode(Node* node, Key key, Value v, Node *p, stack<Node*>* parent)
 {
     Node* newNode;
-    int newKey;
+    Key newKey;
     if(node->keyNum < maxKeyNum) {
         if(node->isLeaf) ((leafNode*)node)->insert(key, v);
         else ((innerNode *)node)->insert(key, p);
@@ -242,9 +241,37 @@ multimap<Key, Value> BPlusTree<Key, Value>::getrange(Key key1, Key key2)
     if(leaf->key[slot] != key1) slot++;
 
     i = slot;
+
     while(true) {
+        bool flag = false;
+        cout << i << "   "<< leaf->key[i] << endl;
+        for(; i >= 0 && leaf->key[i] >= key1 && leaf->key[i] <= key2; i--) {
+          if(i == 0){
+            flag = true;
+            break;
+          }
+        }
+        //all node are in the range
+        if(flag) {
+            if (leaf->left == NULL)
+              break;
+            leaf = leaf -> left;
+            i = leaf->keyNum - 1;
+        }else{
+            if(i==leaf->keyNum-1){
+              if (leaf->right == NULL)
+                break;
+              leaf = leaf -> right;
+              i = 0;
+            } else{
+              i++;
+            }
+            break;
+        }
+    }
+    while(true) {
+
         for(; i < leaf->keyNum && leaf->key[i] >= key1 && leaf->key[i] <= key2; i++) {
-            //res[leaf->key[i]] = leaf->value[i];
             res.insert(pair <Key, Value> (leaf->key[i], leaf->value[i]));
         }
         if(i >= leaf->keyNum) {

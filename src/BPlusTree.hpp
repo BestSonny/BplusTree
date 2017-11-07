@@ -5,6 +5,7 @@
 #include <stack>
 #include <map>
 #include <string>
+#include <assert.h>
 using namespace std;
 template <typename Key, typename Value>
 
@@ -46,7 +47,7 @@ private:
                                                    this->isLeaf = false;}
         virtual int getLower(Key k);
         void insert(Key key, Node *p);
-        int split(Node* newNode, Key k);
+        Key split(Node* newNode, Key k);
     };
 
     class leafNode : public Node
@@ -64,7 +65,7 @@ private:
                                                   this->isLeaf = true; this->left = NULL; this->right = NULL;}
         virtual int getLower(Key k);
         void insert(Key key, Value value);
-        int split(leafNode* newNode);
+        Key split(leafNode* newNode);
     };
 
 private:
@@ -77,10 +78,11 @@ private:
 
 public:
     BPlusTree(int N) {
+        assert(N>=3);
         root = NULL;
         leftHead = NULL;
-        minimumDegree = 2;
-        minKeyNum = minimumDegree - 1;
+        minimumDegree = (N+1)/2;;
+        minKeyNum = (N+1)/2 - 1;
         maxKeyNum = N - 1;
         minChildNum = (N+1)/2;
         maxChildNum = N;
